@@ -1,0 +1,251 @@
+<!-- ============================================ -->
+<!-- DASHBOARD SOC ANALYST - VERSION SIMPLIFIÉE -->
+<!-- ============================================ -->
+
+<div class="dashboard-container">
+  
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <h1><i class="fas fa-shield-alt"></i> SOC Analyst Dashboard</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="toggleScanner()">
+        <i class="fas fa-search"></i> Scan
+      </button>
+      <button class="btn btn-success" (click)="generateReport()">
+        <i class="fas fa-file-alt"></i> Report
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- DASHBOARD CONTENT -->
+  <div *ngIf="!loading">
+
+    <!-- STATS CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+          <h3>{{ stats.activeThreats }}</h3>
+          <p>Active Threats</p>
+          <span class="badge-danger">{{ stats.criticalThreats }} Critical</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i class="fas fa-tasks"></i>
+        <div>
+          <h3>{{ stats.tasksInProgress }}</h3>
+          <p>In Progress</p>
+          <span class="badge-warning">{{ stats.tasksPending }} Pending</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i class="fas fa-chart-line"></i>
+        <div>
+          <h3>{{ stats.reportsGenerated }}</h3>
+          <p>Reports</p>
+          <span class="badge-success">{{ stats.reportsToday }} Today</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i class="fas fa-bell"></i>
+        <div>
+          <h3>{{ stats.newNotifications }}</h3>
+          <p>Notifications</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCANNER PANEL -->
+    <div *ngIf="scannerVisible" class="scanner-panel">
+      <div class="panel-header">
+        <h3><i class="fas fa-radar"></i> Threat Scanner</h3>
+        <button (click)="toggleScanner()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>Type:</label>
+          <select [(ngModel)]="selectedThreatType" class="form-control">
+            <option value="IP">IP Address</option>
+            <option value="URL">URL</option>
+            <option value="HASH">Hash</option>
+            <option value="DOMAIN">Domain</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Value:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="scanValue" 
+            class="form-control"
+            placeholder="Enter value to scan"
+            (keyup.enter)="onScan()">
+        </div>
+        <button class="btn btn-primary" (click)="onScan()" [disabled]="scanning || !scanValue">
+          <i class="fas" [class.fa-spin]="scanning" [class.fa-sync-alt]="scanning" [class.fa-search]="!scanning"></i>
+          {{ scanning ? 'Scanning...' : 'Scan Now' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content-grid">
+
+      <!-- THREATS -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-virus"></i> Recent Threats</h3>
+          <a routerLink="/soc/threats">View All</a>
+        </div>
+        <div class="card-body">
+          <table class="table" *ngIf="recentThreats && recentThreats.length > 0; else noThreats">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Risk</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+                    <tr *ngFor="let threat of getRecentThreats">
+                <td><span class="badge">{{ threat.type }}</span></td>
+                <td><code>{{ threat.value | slice:0:30 }}</code></td>
+                <td><span class="badge-risk" [class]="'risk-' + threat.riskScore">{{ threat.riskScore }}</span></td>
+                <td><span class="badge-status" [class]="'status-' + threat.status">{{ threat.status }}</span></td>
+                <td>
+                  <button class="btn-sm" [routerLink]="['/soc/threats', threat.threatId]">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <ng-template #noThreats>
+            <div class="empty-state">
+              <i class="fas fa-shield-alt"></i>
+              <p>No threats detected</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-clipboard-list"></i> My Tasks</h3>
+          <a routerLink="/soc/tasks">View All</a>
+        </div>
+        <div class="card-body">
+          <div *ngIf="myTasks && myTasks.length > 0; else noTasks">
+            <div class="task-item" *ngFor="let task of myTasks">
+              <div class="task-header">
+                <span class="priority-badge" [class]="'priority-' + task.priority">
+                  <i class="fas fa-flag"></i>
+                </span>
+                <h4>{{ task.title }}</h4>
+                <span class="deadline">{{ getTimeRemaining(task.deadline) }}</span>
+              </div>
+              <p>{{ task.description | slice:0:100 }}...</p>
+              <div class="task-footer">
+                <span class="badge-status" [class]="'status-' + task.status">{{ task.status }}</span>
+                <div class="task-actions">
+                  <button *ngIf="task.status === 'PENDING'" class="btn-sm btn-success" (click)="acceptTask(task.taskId)">
+                    Accept
+                  </button>
+                  <button *ngIf="task.status === 'IN_PROGRESS'" class="btn-sm btn-primary" (click)="completeTask(task.taskId)">
+                    Complete
+                  </button>
+                  <button class="btn-sm" [routerLink]="['/soc/tasks', task.taskId]">
+                    View
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noTasks>
+            <div class="empty-state">
+              <i class="fas fa-check-circle"></i>
+              <p>No tasks assigned</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-file-invoice"></i> Recent Reports</h3>
+          <a routerLink="/soc/reports">View All</a>
+        </div>
+        <div class="card-body">
+          <div *ngIf="recentReports && recentReports.length > 0; else noReports">
+            <div class="report-item" *ngFor="let report of recentReports">
+              <i class="fas fa-file-pdf"></i>
+              <div>
+                <h4>{{ report.type }} Report</h4>
+                <p>{{ report.generatedAt | date:'short' }}</p>
+              </div>
+              <button class="btn-sm" (click)="downloadReport(report.reportId)">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+          </div>
+          <ng-template #noReports>
+            <div class="empty-state">
+              <i class="fas fa-file-alt"></i>
+              <p>No reports available</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-bell"></i> Notifications</h3>
+          <button class="btn-link" (click)="markAllAsRead()" *ngIf="stats.newNotifications > 0">
+            Mark all read
+          </button>
+        </div>
+        <div class="card-body">
+          <div *ngIf="notifications && notifications.length > 0; else noNotifications">
+            <div class="notification-item" 
+                 *ngFor="let notif of notifications" 
+                 [class.unread]="!notif.isRead"
+                 (click)="markAsRead(notif.notificationId)">
+              <i class="fas fa-circle" *ngIf="!notif.isRead"></i>
+              <div>
+                <p>{{ notif.content }}</p>
+                <span>{{ notif.createdAt | date:'short' }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noNotifications>
+            <div class="empty-state">
+              <i class="fas fa-bell-slash"></i>
+              <p>No new notifications</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- CHATBOT BUTTON -->
+  <button class="chatbot-btn" (click)="toggleChatbot()">
+    <i class="fas fa-comments"></i>
+  </button>
+
+</div>
