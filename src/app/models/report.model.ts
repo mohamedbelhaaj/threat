@@ -1,18 +1,17 @@
 export interface Report {
-  reportId: string;
-    uid: string;           // <-- doit être présent
-
+  reportId?: string; // Firestore génère l'ID
   title: string;
   format: 'PDF' | 'CSV';
   generatedAt: Date;
   sizeKB: number;
   downloadUrl: string;
   filters: ReportFilters;
+  uid: string; // userId Firebase Auth
 }
 
 export interface ReportFilters {
   startDate: Date;
   endDate: Date;
-  status?: string[];   // ex: ['NEW', 'INVESTIGATING']
-  priority?: string[]; // ex: ['HIGH', 'CRITICAL']
+  status?: string[];
+  priority?: string[];
 }

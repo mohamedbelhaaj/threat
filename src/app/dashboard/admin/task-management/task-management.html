@@ -1,0 +1,46 @@
+<div class="task-container">
+  <div class="panel-header">
+    <h1>Task Management</h1>
+    <span class="subtitle">Admin Remediation Pipeline</span>
+  </div>
+
+  <section class="quick-add-card">
+    <h3>Create Task</h3>
+    <div class="form-row">
+      <input placeholder="Title" [(ngModel)]="newTask.title" />
+      <select [(ngModel)]="newTask.priority">
+        <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+      </select>
+      <select [(ngModel)]="newTask.actionType">
+        <option value="BLOCK_IP">Block IP</option>
+        <option value="RESTART_SRV">Restart Server</option>
+        <option value="RULE_FIREWALL">Firewall Rule</option>
+      </select>
+      <button class="btn-primary" (click)="addTask()">Add</button>
+    </div>
+    <textarea rows="2" placeholder="Description" [(ngModel)]="newTask.description"></textarea>
+  </section>
+
+  <div class="kanban">
+    <div class="column" *ngFor="let col of columns">
+      <div class="col-header">{{ col.title }}</div>
+      <div class="col-body">
+<div class="task-card"
+     *ngFor="let t of (tasks$ | async) ?? [] | filterByStatus : col.status">          
+     <div class="task-title">{{ t.title }}</div>
+          <div class="task-desc">{{ t.description }}</div>
+          <div class="task-meta">
+            <span class="badge priority-{{ t.priority }}">{{ t.priority }}</span>
+            <span class="badge status-{{ t.status }}">{{ t.status }}</span>
+          </div>
+          <div class="task-actions">
+            <select (change)="dropTask(t.taskId!, $any($event.target).value)">
+              <option *ngFor="let s of statuses" [value]="s" [selected]="s === t.status">{{ s }}</option>
+            </select>
+            <button class="btn-danger" (click)="removeTask(t.taskId!)">🗑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

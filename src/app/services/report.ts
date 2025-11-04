@@ -1,46 +1,44 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, addDoc, collectionData, doc, deleteDoc } from '@angular/fire/firestore';
 import { Storage, ref, uploadBytes, getDownloadURL, deleteObject } from '@angular/fire/storage';
-import { Report, ReportFilters } from '../models/report.models'
+import { Report, ReportFilters } from '../models/report.model'
 import { Observable, from } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
 })
-export class reportService {
+export class ReportService  {
   constructor(
     private firestore: Firestore,
     private storage: Storage,
     private auth: Auth
-  ) {
-    
-  }
+  ) {}
 
-  /* 1. Récupérer les rapports de l’utilisateur connecté */
+  /* ── 1. Récupérer tous les rapports de l’utilisateur connecté ── */
   getReports(): Observable<Report[]> {
     const reportsRef = collection(this.firestore, 'reports');
     return collectionData(reportsRef, { idField: 'reportId' }) as Observable<Report[]>;
   }
 
-  /* 2. Générer + uploader un rapport (fichier + métadonnées) */
+  /* ── 2. Générer + uploader un rapport (fichier + métadonnées) ── */
   async generateReport(
     file: Blob,
     filters: ReportFilters,
     format: 'PDF' | 'CSV'
   ): Promise<Report> {
     const uid = this.auth.currentUser?.uid;
-    if (!uid) throw new Error('User not authenticated');
+    if (!uid) throw new Error('Utilisateur non authentifié');
 
     const timestamp = new Date();
     const fileName = `report_${timestamp.getTime()}.${format.toLowerCase()}`;
     const storageRef = ref(this.storage, `reports/${uid}/${fileName}`);
 
-    // Upload fichier
+    // 2-a. Upload du fichier
     await uploadBytes(storageRef, file);
     const downloadUrl = await getDownloadURL(storageRef);
 
-    // Créer objet Report
+    // 2-b. Construction de l’objet Report
     const report: Omit<Report, 'reportId'> = {
       title: `Threat Report ${timestamp.toLocaleDateString()}`,
       format,
@@ -51,21 +49,26 @@ export class reportService {
       uid
     };
 
-    // Sauvegarder dans Firestore
+    // 2-c. Écriture dans Firestore
     const docRef = await addDoc(collection(this.firestore, 'reports'), report);
+    console.log('📄 Document ajouté dans Firestore :', docRef.id);
+
     return { ...report, reportId: docRef.id };
   }
 
-  /* 3. Supprimer un rapport (metadata + fichier) */
+  /* ── 3. Supprimer un rapport (métadonnées + fichier) ── */
   async deleteReport(report: Report): Promise<void> {
     if (!report.reportId) return;
 
-    // Supprimer fichier Storage
+    // 3-a. Suppression du fichier Storage
     const fileRef = ref(this.storage, report.downloadUrl);
-    await deleteObject(fileRef).catch(() => {}); // ignore si déjà supprimé
+    await deleteObject(fileRef).catch(() => {
+      console.warn('Fichier déjà supprimé ou introuvable');
+    });
 
-    // Supprimer document Firestore
+    // 3-b. Suppression du document Firestore
     const docRef = doc(this.firestore, 'reports', report.reportId);
-    return deleteDoc(docRef);
+    await deleteDoc(docRef);
+    console.log('🗑️ Document supprimé de Firestore :', report.reportId);
   }
 }

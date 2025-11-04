@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 @Component({
@@ -10,7 +10,10 @@ import { RouterModule } from '@angular/router';
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
-export class AdminDashboard {
+export class AdminDashboard implements OnInit {
+  ngOnInit(): void {
+    throw new Error('Method not implemented.');
+  }
     assignTask = [
     { title: 'Analyser les alertes', description: 'Vérifier les logs du SIEM', priority: 'high', status: 'En cours', selectedAnalyst: '' },
     { title: 'Mettre à jour les règles', description: 'Optimiser la détection IDS', priority: 'medium', status: 'Ouvert', selectedAnalyst: '' },

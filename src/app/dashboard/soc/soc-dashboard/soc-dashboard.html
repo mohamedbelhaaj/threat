@@ -103,7 +103,7 @@
       <div class="card">
         <div class="card-header">
           <h3><i class="fas fa-virus"></i> Recent Threats</h3>
-          <a routerLink="/soc/threats">View All</a>
+          <a routerLink="/soc/threat-scanner">View All</a>
         </div>
         <div class="card-body">
           <table class="table" *ngIf="recentThreats && recentThreats.length > 0; else noThreats">
@@ -123,7 +123,7 @@
                 <td><span class="badge-risk" [class]="'risk-' + threat.riskScore">{{ threat.riskScore }}</span></td>
                 <td><span class="badge-status" [class]="'status-' + threat.status">{{ threat.status }}</span></td>
                 <td>
-                  <button class="btn-sm" [routerLink]="['/soc/threats', threat.threatId]">
+                  <button class="btn-sm" [routerLink]="['/soc/threat-detected', threat.threatId]">
                     <i class="fas fa-eye"></i>
                   </button>
                 </td>

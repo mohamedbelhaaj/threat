@@ -1,0 +1,54 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+  <h2 class="text-2xl font-bold mb-6">Rapports d'analyse SOC</h2>
+
+  <!-- Formulaire de génération -->
+  <form class="bg-white p-4 rounded shadow mb-6 grid grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-medium">Date début</label>
+      <input type="date" class="input" [(ngModel)]="filters.startDate" name="startDate">
+    </div>
+    <div>
+      <label class="block text-sm font-medium">Date fin</label>
+      <input type="date" class="input" [(ngModel)]="filters.endDate" name="endDate">
+    </div>
+    <div>
+      <label class="block text-sm font-medium">Format</label>
+      <select class="input" [(ngModel)]="format" name="format">
+        <option value="PDF">PDF</option>
+        <option value="CSV">CSV</option>
+      </select>
+    </div>
+    <div class="flex items-end">
+      <button type="button" (click)="onGenerate()" [disabled]="isLoading"
+              class="btn-primary">
+        {{ isLoading ? 'Génération...' : 'Générer' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Liste des rapports -->
+  <div class="bg-white rounded shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-2 text-left">Titre</th>
+          <th class="px-4 py-2 text-left">Date</th>
+          <th class="px-4 py-2 text-left">Format</th>
+          <th class="px-4 py-2 text-left">Taille</th>
+          <th class="px-4 py-2 text-left"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of reports">
+          <td class="px-4 py-2">{{ r.title }}</td>
+          <td class="px-4 py-2">{{ r.generatedAt | date:'short' }}</td>
+          <td class="px-4 py-2">{{ r.format }}</td>
+          <td class="px-4 py-2">{{ r.sizeKB }} Ko</td>
+          <td class="px-4 py-2">
+            <button (click)="onDownload(r)" class="btn-secondary">Télécharger</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
