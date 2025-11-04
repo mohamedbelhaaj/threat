@@ -6,7 +6,7 @@ export interface Task {
   status: TaskStatus;
   assignee: string; // UID Firebase
   createdAt: Date;
-  deadline?: Date;
+deadline?: Date | null; 
   actionType: string;
 }
 
