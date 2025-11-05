@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #000;
+  font-family: 'Fira Code', monospace;
+  color: #e0e0e0;
+  overflow: hidden;
+  position: relative;
+}
+
+.notif-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background:
+    radial-gradient(ellipse at 15% 25%, rgba(255, 0, 0, .12) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 75%, rgba(255, 0, 0, .08) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0px, rgba(255, 0, 0, .02) 1px, transparent 2px, transparent 4px);
+  animation: atmospherePulse 5s ease-in-out infinite;
+}
+
+@keyframes atmospherePulse {
+  0%, 100% { background-color: #000; }
+  50% { background-color: #0d0000; }
+}
+
+/* scanline + particles identiques à reports */
+.notif-container::before,
+.notif-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.notif-container::before {
+  background: repeating-linear-gradient(0deg, transparent 0px, rgba(255, 0, 0, .03) 1px, transparent 2px, transparent 3px);
+  animation: scanlineMove 10s linear infinite;
+}
+@keyframes scanlineMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(50%); }
+}
+.notif-container::after {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 0, 0, .3), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(255, 0, 0, .3), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(255, 0, 0, .3), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(255, 0, 0, .3), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255, 0, 0, .3), transparent);
+  background-size: 200% 200%;
+  animation: particlesFloat 20s ease-in-out infinite;
+}
+@keyframes particlesFloat {
+  0%, 100% { background-position: 0 0; opacity: .3; }
+  50% { background-position: 100% 100%; opacity: .6; }
+}
+
+/* HEADER */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #330000;
+  position: relative;
+  z-index: 2;
+}
+.panel-header h1 {
+  font-size: 1.8rem;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px #ff0000, 0 0 20px rgba(255, 0, 0, .5);
+  animation: titleGlow 3s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%, 100% { text-shadow: 0 0 10px #ff0000, 0 0 20px rgba(255, 0, 0, .5); }
+  50% { text-shadow: 0 0 15px #ff0000, 0 0 30px rgba(255, 0, 0, .7); }
+}
+
+/* QUICK-SEND CARD */
+.quick-send-card {
+  background: linear-gradient(145deg, #1a0000 0%, #0f0f0f 50%, #1a0000 100%);
+  border: 2px solid #330000;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 0 30px rgba(255, 0, 0, .3);
+  position: relative;
+  z-index: 2;
+}
+.quick-send-card h3 {
+  margin: 0 0 1rem 0;
+  color: #fff;
+  text-shadow: 0 0 5px #ff0000;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.form-row input,
+.form-row select {
+  width: 100%;
+  padding: .5rem;
+  background: #0a0a0a;
+  border: 2px solid #330000;
+  color: #fff;
+  border-radius: 6px;
+  transition: all .3s;
+}
+.form-row input:focus,
+.form-row select:focus {
+  border-color: #ff0000;
+  box-shadow: 0 0 10px #ff0000;
+  outline: none;
+}
+textarea {
+  width: 100%;
+  padding: .5rem;
+  background: #0a0a0a;
+  border: 2px solid #330000;
+  color: #fff;
+  border-radius: 6px;
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* BUTTONS */
+.btn-primary {
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  border: none;
+  color: #fff;
+  padding: .6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all .3s;
+  box-shadow: 0 4px 20px rgba(255, 0, 0, .4);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(255, 0, 0, .6);
+}
+.btn-secondary {
+  background: #30363d;
+  color: #fff;
+  border: none;
+  padding: .4rem .8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: .875rem;
+  transition: background .3s;
+}
+.btn-secondary:hover {
+  background: #444c56;
+}
+
+/* NOTIFICATION LIST */
+.notif-list {
+  position: relative;
+  z-index: 2;
+}
+.notif-card {
+  background: linear-gradient(145deg, #1a0000 0%, #0f0f0f 50%, #1a0000 100%);
+  border: 2px solid #330000;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 25px rgba(255, 0, 0, .25);
+  transition: transform .2s;
+}
+.notif-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 35px rgba(255, 0, 0, .4);
+}
+.notif-card.read {
+  opacity: .6;
+  border-color: #555;
+}
+.notif-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .5rem;
+}
+.notif-title {
+  font-size: 1rem;
+  color: #fff;
+  text-shadow: 0 0 3px #ff0000;
+}
+.notif-content {
+  font-size: .875rem;
+  color: #aaa;
+  margin-bottom: .75rem;
+}
+.notif-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* BADGES */
+.badge {
+  padding: .25rem .5rem;
+  border-radius: 4px;
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.badge.channel-PUSH { background: #ff0000; color: #fff; }
+.badge.channel-EMAIL { background: #e3b341; color: #000; }
+.badge.channel-TELEGRAM { background: #0088cc; color: #fff; }
+.badge.channel-IN_APP { background: #3fb950; color: #000; }
+
+.badge.type-THREAT { background: #ff0000; color: #fff; }
+.badge.type-TASK { background: #e3b341; color: #000; }
+.badge.type-SYSTEM { background: #3fb950; color: #000; }
+
+.date {
+  font-size: .75rem;
+  color: #888;
+}

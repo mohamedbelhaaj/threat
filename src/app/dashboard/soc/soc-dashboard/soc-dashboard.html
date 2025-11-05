@@ -103,7 +103,7 @@
       <div class="card">
         <div class="card-header">
           <h3><i class="fas fa-virus"></i> Recent Threats</h3>
-          <a routerLink="/soc/threat-scanner">View All</a>
+          <a routerLink="/threat-scanner">View All</a>
         </div>
         <div class="card-body">
           <table class="table" *ngIf="recentThreats && recentThreats.length > 0; else noThreats">
@@ -173,6 +173,19 @@
             </div>
           </div>
           <ng-template #noTasks>
+            <div class="card">
+  <div class="card-header">
+    <h3><i class="fas fa-bell"></i> Notifications</h3>
+    <!-- Lien vers la page notifications -->
+    <a routerLink="/notification" class="btn-link">
+      View All
+    </a>
+    <button class="btn-link" (click)="markAllAsRead()" *ngIf="stats.newNotifications > 0">
+      Mark all read
+    </button>
+  </div>
+  ...
+</div>
             <div class="empty-state">
               <i class="fas fa-check-circle"></i>
               <p>No tasks assigned</p>

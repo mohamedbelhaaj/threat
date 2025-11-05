@@ -1,0 +1,38 @@
+<div class="notif-container">
+  <div class="panel-header">
+    <h1>Notifications Center</h1>
+    <span class="subtitle">Multi-canal • Push • Email • Telegram • In-App</span>
+  </div>
+
+  <!-- Quick-send card -->
+  <section class="quick-send-card">
+    <h3>Send Notification</h3>
+    <div class="form-row">
+      <input placeholder="Title" [(ngModel)]="newNotif.title" />
+      <select [(ngModel)]="newNotif.channel">
+        <option *ngFor="let c of channels" [value]="c">{{ c }}</option>
+      </select>
+      <select [(ngModel)]="newNotif.type">
+        <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+      </select>
+      <button class="btn-primary" (click)="send()">Send</button>
+    </div>
+    <textarea rows="2" placeholder="Content" [(ngModel)]="newNotif.content"></textarea>
+  </section>
+
+  <!-- Notifications list -->
+  <div class="notif-list">
+    <div class="notif-card" *ngFor="let n of (notifs$ | async) ?? []" [class.read]="n.isRead">
+      <div class="notif-header">
+        <span class="badge channel-{{ n.channel }}">{{ n.channel }}</span>
+        <span class="badge type-{{ n.type }}">{{ n.type }}</span>
+<span class="date">{{ n.createdAt | date:'short' }}</span>
+      </div>
+      <div class="notif-title">{{ n.title }}</div>
+      <div class="notif-content">{{ n.content }}</div>
+      <div class="notif-actions">
+        <button *ngIf="!n.isRead" class="btn-secondary" (click)="markAsRead(n.notificationId!)">Mark read</button>
+      </div>
+    </div>
+  </div>
+</div>
